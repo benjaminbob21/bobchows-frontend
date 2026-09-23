@@ -26,7 +26,7 @@ const HomePage = () => {
       <div className="grid md:grid-cols-2 gap-5">
         <img src={landingImage} />
         <div className="flex flex-col items-center justify-center gap-4 text-center">
-          <span className="font-bold ttext-3xl tracking-tighter">
+          <span className="font-bold text-3xl tracking-tighter">
             Order takeaway in a flash!
           </span>
           <span>
