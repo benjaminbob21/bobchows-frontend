@@ -37,7 +37,7 @@ const formSchema = z
     menuItems: z.array(
       z.object({
         name: z.string().min(1, "name is required"),
-        price: z.coerce.number().min(1, "price is required"),
+        price: z.coerce.number().min(0.01, "price is required"),
       })
     ),
     imageUrl: z.string().optional(),
@@ -69,13 +69,13 @@ const ManageRestaurantForm = ({ onSave, isLoading, restaurant }: Props) => {
     if (!restaurant) {
       return;
     }
-    const deliveryPriceFormatted = parseInt(
+    const deliveryPriceFormatted = parseFloat(
       (restaurant.deliveryPrice / 100).toFixed(2)
     );
 
     const menuItemsFormatted = restaurant.menuItems.map((item) => ({
       ...item,
-      price: parseInt((item.price / 100).toFixed(2)),
+      price: parseFloat((item.price / 100).toFixed(2)),
     }));
 
     const updatedRestaurant = {
@@ -96,7 +96,7 @@ const ManageRestaurantForm = ({ onSave, isLoading, restaurant }: Props) => {
 
     formData.append(
       "deliveryPrice",
-      (formDataJson.deliveryPrice * 100).toString()
+      Math.round(formDataJson.deliveryPrice * 100).toString()
     );
     formData.append(
       "estimatedDeliveryTime",
@@ -109,7 +109,7 @@ const ManageRestaurantForm = ({ onSave, isLoading, restaurant }: Props) => {
       formData.append(`menuItems[${index}][name]`, menuItem.name);
       formData.append(
         `menuItems[${index}][price]`,
-        (menuItem.price * 100).toString()
+        Math.round(menuItem.price * 100).toString()
       );
     });
 
