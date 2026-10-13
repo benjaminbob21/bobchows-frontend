@@ -24,6 +24,10 @@ const SORT_OPTIONS = [
     label: "Estimated delivery time",
     value: "estimatedDeliveryTime",
   },
+  {
+    label: "Overall rating",
+    value: "averageRating",
+  },
 ];
 
 const SortOptionDropdown = ({ onChange, sortOption }: Props) => {

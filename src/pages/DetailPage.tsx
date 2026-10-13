@@ -10,6 +10,8 @@ import { useParams } from "react-router-dom";
 import CheckoutButton from "@/components/CheckoutButton";
 import { UserFormData } from "@/forms/user-profile-form/UserProfileForm";
 import { useCreateCheckoutSession } from "@/api/OrderApi";
+import Review from "@/components/Review";
+import DisplayReview from "@/components/DisplayReview";
 
 export type CartItem = {
   _id: string;
@@ -126,6 +128,8 @@ const DetailPage = () => {
               addToCart={() => addToCart(menuItem)}
             />
           ))}
+          <Review />
+          <DisplayReview />
         </div>
 
         <div>

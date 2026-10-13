@@ -20,11 +20,24 @@ export type Restaurant = {
   city: string;
   country: string;
   deliveryPrice: number;
+  averageRating: number;
+  totalRating: number;
+  reviewCount: number;
   estimatedDeliveryTime: number;
   cuisines: string[];
   menuItems: MenuItem[];
   imageUrl: string;
   lastUpdated: string;
+};
+
+export type Review = {
+  restaurant: Restaurant;
+  country: string;
+  city: string;
+  name: string;
+  rating: number;
+  comment: string;
+  createdAt: Date;
 };
 
 export type OrderStatus =

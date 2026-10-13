@@ -1,4 +1,4 @@
-import { Order, Restaurant } from "@/types";
+import { Order, Restaurant, Review} from "@/types";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useMutation, useQuery } from "react-query";
 import { toast } from "sonner";
@@ -31,6 +31,8 @@ export const useGetMyRestaurant = () => {
 
   return { restaurant, isLoading };
 };
+
+
 
 export const useCreateMyRestaurant = () => {
   const { getAccessTokenSilently } = useAuth0();
@@ -195,4 +197,76 @@ export const useUpdateMyRestaurantOrder = () => {
   }
 
   return { updateRestaurantStatus, isLoading };
+};
+
+type Reviews = {
+  rating: number;
+  comment: string;
+  restaurantId: string;
+}
+
+export const useSubmitReview = () => {
+  const { getAccessTokenSilently } = useAuth0();
+
+  const submitReviewRequest = async (review: Reviews) => {
+    const accessToken = await getAccessTokenSilently();
+    const response = await fetch(`${API_BASE_URL}/api/reviews`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(review),
+    });
+
+    if (!response.ok) {
+      const errorResponse = await response.json();
+      throw new Error(errorResponse.message || "Failed to submit review");
+    }
+    return response.json();
+  };
+
+  const {
+    mutateAsync: updateReview,
+    isLoading,
+    isSuccess,
+    isError,
+    error,
+    reset,
+  } = useMutation(submitReviewRequest);
+
+  if (isSuccess) {
+    toast.success("Review submitted!");
+  }
+
+  if (isError && error instanceof Error) {
+    toast.error(error.message);
+    reset();
+  }
+
+  return { updateReview, isLoading, reset };
+}
+
+export const useGetReviews = (restaurantId?: string) => {
+  const fetchReviews = async (): Promise<Review[]> => {
+    const response = await fetch(
+      `${API_BASE_URL}/api/reviews/restaurant/${restaurantId}`
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch reviews");
+    }
+
+    return response.json();
+  };
+
+  const {
+    data: reviews,
+    isLoading,
+    error,
+  } = useQuery(["getReviews", restaurantId], fetchReviews, {
+    enabled: !!restaurantId,
+  });
+
+  return { reviews, isLoading, error };
 };

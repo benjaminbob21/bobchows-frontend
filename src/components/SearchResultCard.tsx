@@ -1,7 +1,7 @@
 import { Restaurant } from "@/types";
 import { Link } from "react-router-dom";
 import { AspectRatio } from "./ui/aspect-ratio";
-import { Banknote, Clock, Dot } from "lucide-react";
+import { Banknote, Clock, Dot, Star } from "lucide-react";
 
 type Props = {
   restaurant: Restaurant;
@@ -40,6 +40,10 @@ const SearchResultCard = ({ restaurant }: Props) => {
             <div className="flex items-center gap-1">
               <Banknote />
               Delivery from ${(restaurant.deliveryPrice / 100).toFixed(2)}
+            </div>
+            <div className="flex items-center gap-1">
+              <Star className="text-yellow-700 fill-yellow-500"/>
+              {(restaurant.averageRating).toFixed(1)}
             </div>
           </div>
         </div>
