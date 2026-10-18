@@ -12,6 +12,14 @@ const MainNav = () => {
           <Link to="/order-status" className="font-bold hover:text-purple-500">
             Order Status
           </Link>
+          <p className="font-bold">|</p>
+          <Link
+            to="/group-order-status"
+            className="font-bold hover:text-purple-500"
+          >
+            Group Order Status
+          </Link>
+          <p className="font-bold">|</p>
           <UsernameMenu />
         </>
       ) : (

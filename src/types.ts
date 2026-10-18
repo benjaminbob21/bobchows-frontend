@@ -76,3 +76,30 @@ export type RestaurantSearchResponse = {
     pages: number;
   };
 };
+
+export type GroupOrder = {
+  _id: string;
+  restaurant: Restaurant;
+  user: User;
+  cartItems: {
+    menuItemId: string;
+    name: string;
+    quantity: string;
+  }[];
+  deliveryDetails: {
+    name: string;
+    addressLine1: string;
+    city: string;
+    email: string;
+  };
+  totalParticipants: number;
+  paidParticipants: {
+    email: string;
+    amount: number;
+    user: User;
+  }[];
+  totalAmount: number;
+  status: OrderStatus;
+  createdAt: string;
+  restaurantId: string;
+};

@@ -8,6 +8,8 @@ import ManageRestaurantPage from "./pages/ManageRestaurantPage";
 import SearchPage from "./pages/SearchPage";
 import DetailPage from "./pages/DetailPage";
 import OrderStatusPage from "./pages/OrderStatusPage";
+import JoinGroupPage from "./components/JoinGroupPage";
+import GroupOrderStatusPage from "./pages/GroupOrderStatusPage";
 
 const AppRoutes = () => {
   return (
@@ -37,12 +39,28 @@ const AppRoutes = () => {
           </Layout>
         }
       />
+      <Route
+        path="/join-order/:groupOrderId"
+        element={
+          <Layout showHero={false}>
+            <JoinGroupPage />
+          </Layout>
+        }
+      />
       <Route element={<ProtectedRoute />}>
         <Route
           path="/order-status"
           element={
             <Layout>
               <OrderStatusPage />
+            </Layout>
+          }
+        />
+        <Route
+          path="/group-order-status"
+          element={
+            <Layout>
+              <GroupOrderStatusPage />
             </Layout>
           }
         />

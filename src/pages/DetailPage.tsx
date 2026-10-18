@@ -9,9 +9,13 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import CheckoutButton from "@/components/CheckoutButton";
 import { UserFormData } from "@/forms/user-profile-form/UserProfileForm";
-import { useCreateCheckoutSession } from "@/api/OrderApi";
+import { useCreateCheckoutSession, useCreateGroupOrder } from "@/api/OrderApi";
 import Review from "@/components/Review";
 import DisplayReview from "@/components/DisplayReview";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { ShareGroupOrder } from "@/components/ShareGroupOrder";
+import GroupCheckoutButton from "@/components/GroupCheckoutButton";
 
 export type CartItem = {
   _id: string;
@@ -25,6 +29,13 @@ const DetailPage = () => {
   const { restaurant, isLoading } = useGetRestaurant(restaurantId);
   const { createCheckoutSession, isLoading: isCheckoutLoading } =
     useCreateCheckoutSession();
+  const { createGroupOrder, isLoading: isGroupLoading } = useCreateGroupOrder();
+  const [showGroupOrderDialog, setShowGroupOrderDialog] = useState(false);
+  const [groupOrderData, setGroupOrderData] = useState<{
+    shareableLink: string;
+    groupOrder: any;
+    id: string;
+  } | null>(null);
 
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
     const storedCartItems = sessionStorage.getItem(`cartItems-${restaurantId}`);
@@ -106,6 +117,52 @@ const DetailPage = () => {
     window.location.href = data.url;
   };
 
+  const onGroupCheckout = async (userFormData: UserFormData) => {
+    if (!restaurant) {
+      return;
+    }
+
+    const checkoutData = {
+      cartItems: groupOrderData?.groupOrder.cartItems,
+      restaurantId: restaurant._id,
+      deliveryDetails: {
+        name: userFormData.name,
+        addressLine1: userFormData.addressLine1,
+        city: userFormData.city,
+        country: userFormData.country,
+        email: userFormData.email as string,
+      },
+      groupOrderId: groupOrderData?.id,
+    };
+
+    const data = await createCheckoutSession(checkoutData);
+    window.location.href = data.url;
+  };
+
+  const onGroupInitiate = async () => {
+    if (!restaurant) {
+      return;
+    }
+
+    const checkoutData = {
+      cartItems: cartItems.map((cartItem) => ({
+        menuItemId: cartItem._id,
+        name: cartItem.name,
+        quantity: cartItem.quantity.toString(),
+      })),
+      restaurantId: restaurant._id,
+    };
+
+    const data = await createGroupOrder(checkoutData);
+
+    setGroupOrderData({
+      shareableLink: data.shareableLink,
+      groupOrder: data.groupOrder,
+      id: data.id,
+    });
+    setShowGroupOrderDialog(true);
+  };
+
   if (isLoading || !restaurant) {
     return "Loading...";
   }
@@ -118,6 +175,29 @@ const DetailPage = () => {
           className="rounded-md object-cover h-full w-full"
         />
       </AspectRatio>
+      <Dialog
+        open={showGroupOrderDialog}
+        onOpenChange={setShowGroupOrderDialog}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogTitle className="text-center"></DialogTitle>
+          {groupOrderData && (
+            <div className="items-center">
+              <ShareGroupOrder
+                shareableLink={groupOrderData.shareableLink}
+                groupOrder={groupOrderData.groupOrder}
+              />
+              <div className="text-center pt-5">
+                <GroupCheckoutButton
+                  disabled={cartItems.length === 0}
+                  onCheckout={onGroupCheckout}
+                  isLoading={isCheckoutLoading}
+                />
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
       <div className="grid md:grid-cols-[4fr_2fr] gap-5 md:px-32">
         <div className="flex flex-col gap-4">
           <RestaurantInfo restaurant={restaurant} />
@@ -140,11 +220,22 @@ const DetailPage = () => {
               removeFromCart={removeFromCart}
             />
             <CardFooter>
-              <CheckoutButton
-                disabled={cartItems.length === 0}
-                onCheckout={onCheckout}
-                isLoading={isCheckoutLoading}
-              />
+              <div className="flex flex-col gap-4 flex-1">
+                <CheckoutButton
+                  disabled={cartItems.length === 0}
+                  onCheckout={onCheckout}
+                  isLoading={isCheckoutLoading}
+                />
+                <Button
+                  className="bg-purple-500"
+                  disabled={cartItems.length === 0}
+                  onClick={onGroupInitiate}
+                >
+                  {isGroupLoading
+                    ? "Creating Group Order..."
+                    : "Initiate Group Order"}
+                </Button>
+              </div>
             </CardFooter>
           </Card>
         </div>
