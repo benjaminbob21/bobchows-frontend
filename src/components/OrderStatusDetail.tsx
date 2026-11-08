@@ -6,15 +6,39 @@ type Props = {
 };
 
 const OrderStatusDetail = ({ order }: Props) => {
-  return (
-    <div className="space-y-5">
+  const isGroupOrder = !!order.paidParticipants;
+
+  const renderDeliveringTo = () => {
+    if (isGroupOrder) {
+      const names = order.paidParticipants
+        .map((p) => p.user?.name || "Guest")
+        .filter(Boolean);
+      const display = names.length > 0 ? names.join(", ") : "No one yet";
+      return (
+        <div className="flex flex-col">
+          <span className="font-bold">Delivering to:</span>
+          <span>{display}</span>
+          <span className="text-sm text-gray-500">
+            {names.length}/{order.totalParticipants} joined
+          </span>
+        </div>
+      );
+    }
+    return (
       <div className="flex flex-col">
         <span className="font-bold">Delivering to:</span>
-        <span>{order.deliveryDetails.name}</span>
+        <span>{order.deliveryDetails?.name || "Not set yet"}</span>
         <span>
-          {order.deliveryDetails.addressLine1}, {order.deliveryDetails.city}
+          {order.deliveryDetails?.addressLine1 || "—"},{" "}
+          {order.deliveryDetails?.city || "—"}
         </span>
       </div>
+    );
+  };
+
+  return (
+    <div className="space-y-5">
+      {renderDeliveringTo()}
       <div className="flex flex-col">
         <span className="font-bold">Your Order</span>
         <ul>

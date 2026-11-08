@@ -225,6 +225,50 @@ export const useJoinGroupOrder = () => {
   };
 };
 
+export const useConfirmGroupPayment = () => {
+  const { getAccessTokenSilently } = useAuth0();
+
+  const confirmGroupPaymentRequest = async (groupOrderId: string) => {
+    const accessToken = await getAccessTokenSilently();
+
+    const response = await fetch(
+      `${API_BASE_URL}/api/order/confirm-group-payment`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ groupOrderId }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Unable to confirm payment");
+    }
+
+    return response.json();
+  };
+
+  const {
+    mutateAsync: confirmGroupPayment,
+    isLoading,
+    error,
+    reset,
+  } = useMutation(confirmGroupPaymentRequest);
+
+  if (error) {
+    toast.error(error.toString());
+    reset();
+  }
+
+  return {
+    confirmGroupPayment,
+    isLoading,
+  };
+};
+
 export const useCreateCheckoutSession = () => {
   const { getAccessTokenSilently } = useAuth0();
 

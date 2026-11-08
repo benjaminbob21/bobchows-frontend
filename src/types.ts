@@ -41,6 +41,7 @@ export type Review = {
 };
 
 export type OrderStatus =
+  | "created"
   | "placed"
   | "paid"
   | "inProgress"
@@ -62,6 +63,12 @@ export type Order = {
     city: string;
     email: string;
   };
+  paidParticipants: {
+    email: string;
+    amount: number;
+    user: User;
+  }[];
+  totalParticipants: number;
   totalAmount: number;
   status: OrderStatus;
   createdAt: string;
