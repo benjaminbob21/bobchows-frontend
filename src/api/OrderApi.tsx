@@ -2,6 +2,7 @@ import { GroupOrder, Order } from "@/types";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useMutation, useQuery } from "react-query";
 import { toast } from "sonner";
+import { useGroupOrderSocket } from "./GroupOrderSocket";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -57,6 +58,12 @@ export const useGetGroupOrders = () => {
     getGroupOrdersRequest,
     { refetchInterval: 5000 }
   );
+
+  // Real-time sync: subscribe to push updates for every group order the user
+  // is part of, so new participants / status changes appear immediately
+  // instead of on the next 5s polling tick.
+  const ids = (groupOrder ?? []).map((o) => o._id);
+  useGroupOrderSocket(ids);
 
   return { groupOrder, isLoading };
 };
